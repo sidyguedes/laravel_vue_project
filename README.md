@@ -1,6 +1,6 @@
 # laravel_vue_project
 
-
+Nome: Sidgley de Almeida Guedes
 
 requisitos:
 

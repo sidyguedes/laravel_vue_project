@@ -9,8 +9,20 @@ class PedidoItem extends Model
 {
     protected $table = "pedido_itens";
     protected $timestamp = true;
-    
+
     use HasFactory;
 
     protected $fillable = ['idPedido', 'idProduto', 'numeroPedido', 'quantidade', 'created_at', 'updated_at'];
+
+
+    public function produto()
+    {
+
+        return $this->belongsTo(Produto::class, 'idProduto', 'id');
+
+    }
+
 }
+
+
+

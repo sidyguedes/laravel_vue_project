@@ -21,17 +21,9 @@ class pedidoController extends Controller
 
     public function index()
     {
-        //$pedidos = $this->pedido->paginate($this->totalPage);
 
-        $pedidos = Pedido::join('pedido_itens', 'pedido_itens.idPedido', '=', 'pedidos.id')
-            ->join('produtos', 'produtos.id', '=', 'pedido_itens.idProduto')
-            ->join('clientes', 'clientes.id', '=', 'pedidos.idCliente')
-            ->join('status_pedidos', 'status_pedidos.id', '=', 'pedidos.idStatusPedido')
-            ->get(['clientes.NomeCliente', 'clientes.SobrenomeCliente',
-             'clientes.cpf', 'clientes.email', 'produtos.nomeProduto',
-             'produtos.valorUnitario', 'produtos.codBarras', 'status_pedidos.statusPedido', 'pedido_itens.quantidade' ]);
+        $pedidos = $this->pedido->with('itens.produto', 'cliente', 'status')->paginate($this->totalPage);
 
-         dd($pedidos);    
         return response()->json($pedidos);
     }
 
@@ -48,17 +40,17 @@ class pedidoController extends Controller
         $validate = validator($data, $this->pedido->rules());
 
         if ($validate->fails()) {
-           
+
             $messages = $validate->messages();
             return response()->json(['validate.error', $messages]);
         }
- 
+
         if (!$insert = $this->pedido->create($data) ) {
-            
+
             return response()->json(['error' => 'error insert'], 500);
         }
-        
-   
+
+
         foreach ($data['itens'] as $item) {
             $itens[] = [
                 'idPedido' => $insert['id'],
@@ -70,6 +62,7 @@ class pedidoController extends Controller
         }
 
         PedidoItem::insert($itens);
+
 
         return response()->json($insert);
 
@@ -102,7 +95,7 @@ class pedidoController extends Controller
 
         $validate = validator($data, $this->pedido->rules($id));
         if ($validate->fails()) {
-           
+
             $messages = $validate->messages();
             return response()->json(['validate.error', $messages]);
         }
@@ -142,13 +135,13 @@ class pedidoController extends Controller
         $data = $request->all();
         $validate = validator($data, $this->pedido->rulesSearch());
         if ($validate->fails()) {
-           
+
             $messages = $validate->messages();
             return response()->json(['validate.error', $messages]);
         }
 
         $pedidos = $this->pedido->search($data, $this->totalPage);
         return response()->json($pedidos);
-       
+
     }
 }

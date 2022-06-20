@@ -8,14 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Pedido extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
-        'idCliente', 
-        'idStatusPedido', 
+        'idCliente',
+        'idStatusPedido',
         'dtPedido'
     ];
 
-    public function rules($id = '') 
+    public function rules($id = '')
     {
         return [
             'idCliente' => "required",
@@ -25,7 +25,7 @@ class Pedido extends Model
 
     }
 
-    public function rulesSearch($id = '') 
+    public function rulesSearch($id = '')
     {
         return [
             'key-search' => 'required'
@@ -33,12 +33,32 @@ class Pedido extends Model
 
     }
 
-    public function search($data, $totalPage) 
+    public function search($data, $totalPage)
     {
-        return 
+        return
             $this->where ('dtPedido', $data['key-search'])
                 ->paginate($totalPage);
 
     }
-    
+
+    public function itens()
+    {
+        return $this->hasMany(PedidoItem::class, 'idPedido', 'id');
+
+    }
+
+    public function cliente()
+    {
+
+        return $this->belongsTo(Cliente::class, 'idCliente', 'id');
+
+    }
+
+    public function status()
+    {
+
+        return $this->belongsTo(StatusPedido::class, 'idStatusPedido', 'id');
+
+    }
+
 }

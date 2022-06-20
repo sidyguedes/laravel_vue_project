@@ -19,9 +19,9 @@ class DatabaseSeeder extends Seeder
            //UsersTableSeeder::class,
         ]);
         //\App\Models\User::factory(1)->create();
-       //\App\Models\Cliente::factory(15)->create();
-        //\App\Models\Pedido::factory(15)->create();
-        \App\Models\Produto::factory(30)->create();
-        //\App\Models\PedidoItem::factory(15)->create();
+       //\App\Models\Cliente::factory(50)->create();
+        //\App\Models\Pedido::factory(50)->create();
+        //\App\Models\Produto::factory(50)->create();
+        //\App\Models\PedidoItem::factory(50)->create();
     }
 }

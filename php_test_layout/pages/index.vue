@@ -1,7 +1,7 @@
 <template>
   <v-row justify="center" align="center">
     <v-col cols="12" sm="8" md="12" class="mt-16">
-      <v-btn @click="modalCliente = !modalCliente" color="#06283D" class="ma-3 white--text d-flex ml-auto">
+      <v-btn @click="modalCliente = !modalCliente" color="rgb(9 81 124)" class="ma-3 white--text d-flex ml-auto">
         Inserir Cliente
         <v-icon right dark>
           mdi-plus
@@ -205,7 +205,7 @@
           console.log(error);
         })
         .then(function () {
-          
+
         });
       },
 
@@ -277,7 +277,7 @@
           .catch(error => {
             this.errorMessage = error.message;
             console.error("Verifique os dados e tente novamente", error);
-            
+
           });
         }
       },
@@ -301,7 +301,7 @@
 <style scoped lang="scss">
   .v-data-table::v-deep th {
     font-size: 15px !important;
-    background-color: #06283d !important;
+    background-color: rgb(9 81 124) !important;
     color: #ffffff !important;
   }
 

@@ -1,7 +1,7 @@
 <template>
   <v-row justify="center" align="center">
     <v-col cols="12" sm="8" md="12" class="mt-16">
-      <v-btn @click="modalProduto = !modalProduto" color="#06283D" class="ma-3 white--text d-flex ml-auto">
+      <v-btn @click="modalProduto = !modalProduto" color="rgb(9 81 124)" class="ma-3 white--text d-flex ml-auto">
         Inserir Produto
         <v-icon right dark>
           mdi-plus
@@ -210,7 +210,7 @@
           console.log(error);
         })
         .then(function () {
-          
+
         });
       },
 
@@ -252,7 +252,7 @@
             this.nomeProduto = '',
             this.valorUnitario = '',
             this.codBarras = '',
-    
+
             this.modalProduto = !this.modalProduto;
             this.articleId = response.data.id;
 
@@ -282,7 +282,7 @@
           .catch(error => {
             this.errorMessage = error.message;
             console.error("Verifique os dados e tente novamente", error);
-            
+
           });
         }
       },
@@ -305,7 +305,7 @@
 <style scoped lang="scss">
   .v-data-table::v-deep th {
     font-size: 15px !important;
-    background-color: #06283d !important;
+    background-color: rgb(9 81 124) !important;
     color: #ffffff !important;
   }
 
@@ -314,5 +314,5 @@
   .theme--light.v-data-table .v-data-table-header th.sortable .v-data-table-header__icon {
     background-color: white !important;
   }
-  
+
 </style>

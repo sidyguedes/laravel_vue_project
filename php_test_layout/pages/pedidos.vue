@@ -1,7 +1,7 @@
 <template>
   <v-row justify="center" align="center">
     <v-col cols="12" sm="8" md="12" class="mt-16">
-      <v-btn @click="modalPedido = !modalPedido" color="#06283D" class="ma-3 white--text d-flex ml-auto">
+      <v-btn @click="modalPedido = !modalPedido" color="rgb(9 81 124)" class="ma-3 white--text d-flex ml-auto">
         Novo Pedido
         <v-icon right dark>
           mdi-plus
@@ -14,18 +14,19 @@
           <v-text-field v-model="search" append-icon="mdi-magnify" label="Buscar" single-line hide-details>
           </v-text-field>
         </v-card-title>
-        <v-data-table class="mt-10" :hide-default-footer="true" sort-by="nomeCliente" must-sort
+        <v-data-table class="mt-10" :hide-default-footer="true" sort-by="pedido.nomeCliente" must-sort
           :loading="false"
           loading-text="Carregando... Por favor aguarde" item-key="name" :headers="headers" :items="pedidos"
           :search="search">
-          <template v-slot:item="{ item }">
+          <template v-slot:item.nomeProduto="{ item }">
             <tr>
-              <td class="pa-4">Sidy Guedes</td>
-              <td class="pa-4">084.134.969-00</td>
-              <td class="pa-4">sidgley_guedes@hotmail.com</td>
-              <td class="pa-0">11/07/2022</td>
-              <td class="pa-0">Em aberto</td>
-              <td class="pa-4"><a href="#">Ver Produtos</a></td>
+              <td class="pa-0">
+                 <span v-for="produt in item.itens" :key="produt" class="body">{{produt.produto.nomeProduto}} <b>&nbsp; | </b></span>
+              </td>
+            </tr>
+          </template>
+          <template v-slot:item.acao="{ item }">
+            <tr>
               <td class="pa-0">
                 <v-btn class="mx-2" icon dark small color="primary" @click.prevent="getPedido(item.id)">
                   <v-icon dark>mdi-pencil</v-icon>
@@ -58,9 +59,9 @@
                 <v-col cols="12" sm="6" md="6">
                   <v-select :items="comboProdutos" item-text="nomeProduto" v-model="selectedProduto" item-value="id" label="Selecione o Produto" required ></v-select>
                 </v-col>
-                <v-col cols="12" sm="6" md="6" class="d-flex"> 
+                <v-col cols="12" sm="6" md="6" class="d-flex">
                   <v-select :items="qtdProdutos" v-model="selectedqtd" label="Quantidade" required @change="addProduto(selectedProduto)"></v-select>
-                </v-col> 
+                </v-col>
                 <v-col cols="10" sm="6" md="12" class="d-flex">
                   <ul id="listaItens">
                     <li v-for="pedido in pedidoItens" :key="pedido.id">
@@ -146,40 +147,48 @@
         total: 0
       },
       clientes: [],
+      detalheItensPedido: [],
       headers: [{
             text: 'Cliente',
             align: 'start',
             sortable: true,
-            value: 'nomeCliente',
+            value: 'cliente.nomeCliente',
           },
           {
             text: 'CPF',
-            value: 'cpf',
+            value: 'cliente.cpf',
             sortable: true,
+            align: 'start',
           },
           {
             text: 'Email',
-            value: 'email',
+            value: 'cliente.email',
             sortable: true,
+            align: 'start',
           },
           {
             text: 'Data Pedido',
             value: 'dtPedido',
             sortable: true,
+            align: 'start',
           },
           {
             text: 'Status',
-            value: 'status',
+            value: 'status.statusPedido',
             sortable: true,
+            align: 'start',
           },
           {
             text: 'Produtos',
-            value: 'idPedido',
+            value: 'nomeProduto',
             sortable: true,
+            align: 'start',
           },
           {
             text: 'Ações',
             sortable: false,
+            value: 'acao',
+            align: 'start',
           },
         ],
       qtdProdutos:['1','2','3','4','5','6','7','8','9','10'],
@@ -189,6 +198,7 @@
     mounted(){
       this.getClientes();
       this.getProdutos();
+      this.getPedidos();
     },
 
     methods: {
@@ -207,14 +217,14 @@
           console.log(error);
         })
         .then(function () {
-          
+
         });
       },
 
       removerProduto(idProduto){
-
+        console.log("remova", idProduto);
         var index = this.pedidoItens.map(x => {
-          return x.id;
+          return x.idProduto;
         }).indexOf(idProduto);
 
         this.pedidoItens.splice(index, 1);
@@ -223,18 +233,15 @@
 
       getClientes() {
         var context = this;
-        axios.get('http://localhost/api/clientes?page='+ context.pagination.current)
+        axios.get('http://localhost/api/clientes')
           .then(function (response) {
           context.clientes = response.data.data;
-          
+
           context.clientes.forEach(dados => {
 
             context.comboClientes.push({nomeCliente : dados.nomeCliente + ' ' + dados.sobrenomeCliente, id: dados.id});
 
           });
-
-          context.pagination.current = response.data.current_page;
-          context.pagination.total = response.data.last_page;
 
         })
         .catch(function (error) {
@@ -248,20 +255,15 @@
 
        getProdutos() {
         var context = this;
-        axios.get('http://localhost/api/produtos?page='+ context.pagination.current)
+        axios.get('http://localhost/api/produtos')
           .then(function (response) {
           context.produtos = response.data.data;
-          
+
           context.produtos.forEach(dados => {
 
             context.comboProdutos.push({nomeProduto : dados.nomeProduto, id: dados.id });
-              
+
           });
-
-          //console.log(context.comboIdProdutos);
-
-          context.pagination.current = response.data.current_page;
-          context.pagination.total = response.data.last_page;
 
         })
         .catch(function (error) {
@@ -281,8 +283,33 @@
 
         return dateTime;
       },
-      getPedido() {
-        console.log('ss');
+      getPedidos() {
+        var context = this;
+        axios.get('http://localhost/api/pedidos?page='+ context.pagination.current)
+          .then(function (response) {
+
+          context.pedidos = response.data.data;
+
+          for (let index = 0; index < context.pedidos.length; index++) {
+
+            context.detalheItensPedido.push(context.pedidos[index].itens[index]);
+
+          }
+          console.log('detalhes', context.detalheItensPedido);
+
+
+          context.pagination.current = response.data.current_page;
+          context.pagination.total = response.data.last_page;
+
+
+        })
+        .catch(function (error) {
+          // handle error
+          console.log(error);
+        })
+        .then(function () {
+          // always executed
+        });
       },
       deletarPedido(){
         console.log('sss');
@@ -290,8 +317,14 @@
       onPageChange() {
         this.getProdutos();
       },
+
       clearVariaveis(){
-        console.log('sss')
+        this.selectedCliente = '';
+        this.selectedStatus = '';
+        this.pedidoItens = '';
+        this.selectedqtd = '';
+        this.selectedProduto = '';
+        this.modalPedido = !this.modalPedido;
       },
       inserirPedido(btnTitle){
         this.btnModalTitle = 'Cadastrar';
@@ -318,7 +351,7 @@
             this.selectedqtd = '';
             this.selectedProduto = '';
 
-            
+            getPedidos();
 
           })
           .catch(error => {
@@ -327,26 +360,6 @@
           });
         }
 
-        // if (btnTitle == 'Atualizar') {
-        //   const dados = {
-        //     nomeProduto: this.nomeProduto,
-        //     valorUnitario: this.valorUnitario,
-        //     codBarras: this.codBarras,
-
-        //   };
-        //   axios.put("http://localhost/api/produtos/"+this.idProduto, dados)
-        //   .then(response => {
-        //     this.modalProduto = !this.modalProduto;
-        //     alert('Dados atualizados com sucesso!');
-        //     console.log(response);
-        //     this.getProdutos();
-        //   })
-        //   .catch(error => {
-        //     this.errorMessage = error.message;
-        //     console.error("Verifique os dados e tente novamente", error);
-            
-        //   });
-        // }
       }
 
     }
